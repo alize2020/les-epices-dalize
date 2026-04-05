@@ -19,6 +19,18 @@ header nav {
   gap: 1rem;
 }
 
+.header-logo {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  .header-logo {
+    height: 36px;
+  }
+}
+
 .hero {
   background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)),
     url("plusieurs1.png") center/cover no-repeat;

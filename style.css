@@ -19,6 +19,32 @@ header nav {
   gap: 1rem;
 }
 
+header nav a {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+header nav a:hover {
+  transform: translateY(-2px);
+  color: #ffd700 !important;
+}
+
+header nav a::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -5px;
+  left: 50%;
+  background-color: #ffd700;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+header nav a:hover::after {
+  width: 100%;
+}
+
 .header-logo {
   height: 40px;
   width: auto;

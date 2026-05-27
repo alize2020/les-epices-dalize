@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administration - Les Épices d’Alizé</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <style>
+    body { background-color: #f8f9fa; }
+    .admin-header { background-color: #b85c38; color: white; padding: 15px 20px; }
+    #dashboard-section { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- En-tête -->
+  <div class="admin-header d-flex justify-content-between align-items-center">
+    <h3 class="m-0">Panneau d'Administration</h3>
+    <a href="index.html" class="text-white text-decoration-none"><i class="bi bi-box-arrow-up-right"></i> Voir le site</a>
+  </div>
+
+  <div class="container mt-5">
+    
+    <!-- Bannière Avertissement Démo (gérée par JS) -->
+    <div id="demo-banner" class="alert alert-warning d-none text-center fw-bold"></div>
+
+    <!-- Section Connexion -->
+    <div id="login-section" class="row justify-content-center">
+      <div class="col-md-5">
+        <div class="card shadow-sm">
+          <div class="card-body p-4">
+            <h4 class="text-center mb-4">Connexion</h4>
+            <form id="login-form">
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" id="email" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Mot de passe</label>
+                <input type="password" id="password" class="form-control" required>
+              </div>
+              <button type="submit" class="btn text-white w-100" style="background-color: #b85c38;">Se connecter</button>
+              <p id="login-error" class="text-danger text-center mt-3 d-none">Identifiants incorrects.</p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Dashboard -->
+    <div id="dashboard-section">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Gestion des Produits</h2>
+        <button id="logout-btn" class="btn btn-outline-danger">Déconnexion</button>
+      </div>
+
+      <div class="row">
+        <!-- Formulaire d'ajout -->
+        <div class="col-md-4 mb-4">
+          <div class="card shadow-sm">
+            <div class="card-header bg-white">
+              <h5 class="mb-0">Ajouter un produit</h5>
+            </div>
+            <div class="card-body">
+              <form id="add-product-form">
+                <div class="mb-3">
+                  <label class="form-label">Nom du produit</label>
+                  <input type="text" id="product-name" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Prix (ex: 1500 FCFA)</label>
+                  <input type="text" id="product-price" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Image</label>
+                  <input type="file" id="product-image" class="form-control" accept="image/*" required>
+                </div>
+                <button type="submit" class="btn btn-success w-100" id="submit-product-btn">
+                  Enregistrer
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Liste des produits -->
+        <div class="col-md-8">
+          <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Produits en ligne</h5>
+              <button class="btn btn-sm btn-outline-secondary" id="refresh-btn"><i class="bi bi-arrow-clockwise"></i> Actualiser</button>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th style="width: 80px;">Image</th>
+                      <th>Nom</th>
+                      <th>Prix</th>
+                      <th class="text-end">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-products-list">
+                    <!-- Rempli par JS -->
+                  </tbody>
+                </table>
+              </div>
+              <div id="admin-loading" class="text-center p-4">
+                <div class="spinner-border text-secondary" role="status"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="admin.js"></script>
+</body>
+</html>

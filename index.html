@@ -6,71 +6,38 @@
   <meta name="description" content="Les Épices d’Alizé : Découvrez notre sélection d'épices locales, 100% naturelles, pour sublimer vos plats faits maison.">
   <title>Les Épices d’Alizé - Épices Naturelles & Locales</title>
 
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SG1MRSLPED"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-SG1MRSLPED');
+  </script>
+
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
 
   <style>
-    body {
-      background-color: #fdf6f0;
-    }
-    header {
-      background-color: #b85c38;
-    }
-    header h2, header nav a {
-      color: white;
-    }
+    body { background-color: #fdf6f0; }
+    header { background-color: #b85c38; }
+    header h2, header nav a { color: white; }
+    .header-logo { height: 40px; border-radius: 5px; }
     .hero {
-      background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
-                  url("plusieurs1.png") center/cover no-repeat;
-      color: white;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      min-height: 600px;
-      padding: 0 20px;
+      background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url("plusieurs1.png") center/cover no-repeat;
+      color: white; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 600px; padding: 0 20px;
     }
-    .hero h1 {
-      font-size: 3rem;
-      font-weight: bold;
-      margin-bottom: 1rem;
-    }
-    .hero p {
-      font-size: 1.2rem;
-      max-width: 600px;
-      margin-bottom: 2rem;
-    }
-    footer {
-      background-color: #b85c38;
-      color: white;
-      text-align: center;
-      padding: 20px;
-    }
-    .about {
-      background-color: #fff8f2;
-    }
-    .about h2 {
-      color: #b85c38;
-      font-weight: bold;
-    }
-    .about p {
-      font-size: 1.1rem;
-      line-height: 1.6;
-      color: #333;
-    }
-    .about img {
-      max-width: 70%;
-      height: auto;
-      display: block;
-      margin: 0 auto;
-    }
-    @media (max-width: 768px) {
-      .about img {
-        max-width: 100%;
-        margin-bottom: 20px;
-      }
-    }
+    .hero h1 { font-size: 3rem; font-weight: bold; margin-bottom: 1rem; }
+    .hero p { font-size: 1.2rem; max-width: 600px; margin-bottom: 2rem; }
+    footer { background-color: #b85c38; color: white; padding: 20px 0; }
+    footer a { color: #fdf6f0; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    .about { background-color: #fff8f2; }
+    .about h2 { color: #b85c38; font-weight: bold; }
+    .about p { font-size: 1.1rem; line-height: 1.6; color: #333; }
+    .about img { max-width: 70%; height: auto; display: block; margin: 0 auto; }
+    @media (max-width: 768px) { .about img { max-width: 100%; margin-bottom: 20px; } }
   </style>
 </head>
 
@@ -78,12 +45,15 @@
 
 <!-- Header -->
 <header class="d-flex justify-content-between align-items-center p-3">
-  <h2 class="m-0 fs-4">Les Épices d’Alizé</h2>
-  <nav>
-    <a href="#" class="me-3 text-decoration-none">Accueil</a>
-    <a href="#epices" class="me-3 text-decoration-none">Nos Épices</a>
-    <a href="#about" class="me-3 text-decoration-none">À propos</a>
-    <a href="#contact" class="text-decoration-none">Contact</a>
+  <div class="d-flex align-items-center">
+    <img src="./logo_epice_alize.jpeg" alt="Logo Les Épices d’Alize" class="header-logo me-2" onerror="this.style.display='none'">
+    <a href="#" class="header-brand text-decoration-none text-white fs-5 fw-bold">Les Épices d’Alizé</a>
+  </div>
+  <nav class="header-nav d-none d-md-block">
+    <a href="#" class="me-3 text-decoration-none text-white">Accueil</a>
+    <a href="#epices" class="me-3 text-decoration-none text-white">Nos Épices</a>
+    <a href="#about" class="me-3 text-decoration-none text-white">À propos</a>
+    <a href="#contact" class="text-decoration-none text-white">Contact</a>
   </nav>
 </header>
 
@@ -97,13 +67,10 @@
 <!-- Nos épices -->
 <section id="epices" class="container mb-5">
   <h2 class="text-center mb-4" style="color: #b85c38; font-weight: bold;">Nos Épices</h2>
-  
   <!-- Conteneur pour les produits dynamiques -->
   <div id="products-container" class="row g-4 justify-content-center">
     <div class="text-center">
-      <div class="spinner-border text-warning" role="status">
-        <span class="visually-hidden">Chargement...</span>
-      </div>
+      <div class="spinner-border text-warning" role="status"><span class="visually-hidden">Chargement...</span></div>
       <p class="mt-2 text-muted">Chargement de nos épices...</p>
     </div>
   </div>
@@ -114,19 +81,11 @@
   <div class="container">
     <h2 class="text-center mb-4">À propos de Les Épices d’Alizé</h2>
     <div class="row align-items-center">
-      <!-- Texte -->
       <div class="col-md-6 mb-4 mb-md-0">
-        <p>
-          Chez <strong>Les Épices d’Alizé</strong>, nous sélectionnons avec soin les meilleures épices locales pour offrir à vos plats des saveurs authentiques et uniques. Chaque produit est naturel, de qualité supérieure et prêt à sublimer vos recettes.
-        </p>
-        <p>
-          Nous croyons en la richesse de notre terroir et en la qualité des produits locaux. Que ce soit notre mélange signature, notre piment Tankwa, notre soumbala ou notre curcuma, chaque épice est choisie pour son goût exceptionnel et ses bienfaits naturels.
-        </p>
-        <p>
-          Notre objectif est simple : vous offrir des épices qui réveillent vos sens et apportent la touche finale à vos plats faits maison.
-        </p>
+        <p>Chez <strong>Les Épices d’Alizé</strong>, nous sélectionnons avec soin les meilleures épices locales pour offrir à vos plats des saveurs authentiques et uniques. Chaque produit est naturel, de qualité supérieure et prêt à sublimer vos recettes.</p>
+        <p>Nous croyons en la richesse de notre terroir et en la qualité des produits locaux. Que ce soit notre mélange signature, notre piment Tankwa, notre soumbala ou notre curcuma, chaque épice est choisie pour son goût exceptionnel et ses bienfaits naturels.</p>
+        <p>Notre objectif est simple : vous offrir des épices qui réveillent vos sens et apportent la touche finale à vos plats faits maison.</p>
       </div>
-      <!-- Image -->
       <div class="col-md-6">
         <img src="tout.jpg" alt="Sélection de nos épices" class="img-fluid rounded shadow">
       </div>
@@ -152,15 +111,24 @@
 </section>
 
 <!-- Footer -->
-<footer>
-  © 2025 Les Épices d’Alizé – Tous droits réservés<br>
-  <a href="admin.html" class="text-white-50 text-decoration-none" style="font-size: 0.8rem;">Accès Administrateur</a>
+<footer class="text-white py-4">
+  <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center text-center text-md-start">
+    <div class="mb-3 mb-md-0">
+      <p class="mb-1">© 2026 Les Épices d’Alizé – Tous droits réservés</p>
+      <a href="admin.html" style="font-size: 0.8rem; opacity: 0.7;">Accès Administrateur</a>
+    </div>
+    <div class="d-flex flex-column flex-md-row gap-3">
+      <a href="https://www.facebook.com/share/1JFa3TkS1X/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer"><i class="bi bi-facebook"></i> Facebook</a>
+      <a href="https://www.linkedin.com/in/aliz%C3%A8ta-malam-37384a104?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank" rel="noopener noreferrer"><i class="bi bi-linkedin"></i> LinkedIn</a>
+      <a href="https://www.tiktok.com/@les.epices.dalize?_r=1&_t=ZS-95I8QLFsWQe" target="_blank" rel="noopener noreferrer"><i class="bi bi-tiktok"></i> TikTok</a>
+    </div>
+  </div>
 </footer>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Application Logic -->
+<!-- Application Logic (Firebase) -->
 <script type="module" src="app.js"></script>
 
 </body>

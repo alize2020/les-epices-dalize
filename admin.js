@@ -137,7 +137,7 @@ addProductForm.addEventListener('submit', async (e) => {
   
   const name = document.getElementById('product-name').value;
   const price = document.getElementById('product-price').value;
-  const imageFile = document.getElementById('product-image').files[0];
+  const imageUrl = document.getElementById('product-image').value;
 
   if (isDemoMode) {
     // Mode démo: on ajoute juste visuellement au tableau
@@ -158,12 +158,7 @@ addProductForm.addEventListener('submit', async (e) => {
   submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enregistrement...';
 
   try {
-    // 1. Upload Image to Storage
-    const imageRef = ref(storage, 'products/' + Date.now() + '_' + imageFile.name);
-    await uploadBytes(imageRef, imageFile);
-    const imageUrl = await getDownloadURL(imageRef);
-
-    // 2. Save info to Firestore
+    // Save info directly to Firestore without uploading image to Storage
     await addDoc(collection(db, "products"), {
       name: name,
       price: price,

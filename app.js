@@ -1,9 +1,9 @@
-import { db, firebaseConfig } from './firebase-config.js';
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+// supabase-app.js – front‑end product display
+import { supabase } from './supabase-config.js';
 
 const productsContainer = document.getElementById('products-container');
 
-// Mock data (fallback si Firebase n'est pas configuré)
+// Demo fallback products (used only if Supabase not configured)
 const mockProducts = [
   { id: '1', name: 'Mélange de 10 épices', price: '1500 FCFA', image: 'melange.jpg' },
   { id: '2', name: 'Piment Tankwa', price: '1500 FCFA', image: 'piment.jpg' },
@@ -31,41 +31,31 @@ function createProductCard(product) {
 }
 
 async function loadProducts() {
-  productsContainer.innerHTML = ''; // Vide le conteneur (retire le loader)
+  productsContainer.innerHTML = '';
 
-  // Vérifie si Firebase est configuré, sinon mode Démo
-  if (firebaseConfig.apiKey === "VOTRE_API_KEY") {
-    showDemoBanner();
-    mockProducts.forEach(product => {
-      productsContainer.innerHTML += createProductCard(product);
-    });
+  // If Supabase URL or anon key missing, fall back to mock data
+  if (!supabase) {
+    mockProducts.forEach(p => productsContainer.innerHTML += createProductCard(p));
     return;
   }
 
   try {
-    const querySnapshot = await getDocs(collection(db, "products"));
-    if (querySnapshot.empty) {
+    const { data: products, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    if (!products || products.length === 0) {
       productsContainer.innerHTML = '<p class="text-center">Aucun produit disponible pour le moment.</p>';
       return;
     }
-
-    querySnapshot.forEach((doc) => {
-      const product = doc.data();
-      product.id = doc.id;
-      productsContainer.innerHTML += createProductCard(product);
+    products.forEach(product => {
+      // Ensure the image field matches the front‑end expectation
+      const img = product.image_url || product.image;
+      const cardProduct = { ...product, image: img };
+      productsContainer.innerHTML += createProductCard(cardProduct);
     });
-  } catch (error) {
-    console.error("Erreur lors de la récupération des produits :", error);
+  } catch (err) {
+    console.error('Erreur lors du chargement des produits :', err);
     productsContainer.innerHTML = '<p class="text-center text-danger">Erreur de chargement des produits. Veuillez réessayer plus tard.</p>';
   }
 }
 
-function showDemoBanner() {
-  const banner = document.createElement('div');
-  banner.className = 'bg-danger text-white text-center py-2 fw-bold';
-  banner.innerHTML = '⚠️ MODE DÉMO : Firebase n\'est pas encore configuré. Les produits affichés sont des exemples. <a href="admin.html" class="text-white text-decoration-underline">Configurer l\'administration</a>';
-  document.body.prepend(banner);
-}
-
-// Lancer le chargement
 document.addEventListener('DOMContentLoaded', loadProducts);

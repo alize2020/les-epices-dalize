@@ -1,7 +1,5 @@
-import { db, storage, auth, firebaseConfig } from './firebase-config.js';
-import { collection, getDocs, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
-import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+// supabase-admin.js – admin panel with Supabase
+import { supabase } from './supabase-config.js';
 
 // DOM Elements
 const loginSection = document.getElementById('login-section');
@@ -16,14 +14,14 @@ const refreshBtn = document.getElementById('refresh-btn');
 const demoBanner = document.getElementById('demo-banner');
 const submitBtn = document.getElementById('submit-product-btn');
 
-// Mode Démo check
-const isDemoMode = firebaseConfig.apiKey === "VOTRE_API_KEY";
+// Demo mode: if Supabase URL or anon key missing (unlikely here), keep simple demo UI
+const isDemoMode = false; // Set to true only for local testing without Supabase
 
-// --- GESTION DE L'AUTHENTIFICATION ---
+// -------------------- Auth --------------------
 if (isDemoMode) {
   demoBanner.classList.remove('d-none');
-  demoBanner.innerHTML = "⚠️ MODE DÉMO ACTIF : Firebase n'est pas configuré. Connectez-vous avec n'importe quel email/mot de passe pour tester l'interface. Les ajouts ne seront pas sauvegardés.";
-  
+  demoBanner.innerHTML = "⚠️ MODE DÉMO ACTIF : Supabase non configuré. Utilisez n'importe quel email/mot de passe pour tester l'interface. Les ajouts ne seront pas sauvegardés.";
+
   // Fake login for demo
   loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -31,16 +29,14 @@ if (isDemoMode) {
     dashboardSection.style.display = 'block';
     loadAdminProducts();
   });
-  
   logoutBtn.addEventListener('click', () => {
     loginSection.style.display = 'flex';
     dashboardSection.style.display = 'none';
   });
-
 } else {
-  // Real Firebase Auth
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
+  // Real Supabase Auth – email/password sign‑in
+  supabase.auth.onAuthStateChange((_event, session) => {
+    if (session && session.user) {
       loginSection.style.display = 'none';
       dashboardSection.style.display = 'block';
       loadAdminProducts();
@@ -54,93 +50,70 @@ if (isDemoMode) {
     e.preventDefault();
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      loginError.classList.add('d-none');
-    } catch (error) {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
       loginError.classList.remove('d-none');
       console.error(error);
+    } else {
+      loginError.classList.add('d-none');
     }
   });
 
   logoutBtn.addEventListener('click', async () => {
-    await signOut(auth);
+    await supabase.auth.signOut();
   });
 }
 
-// --- GESTION DES PRODUITS ---
-
-// Charger les produits
+// -------------------- Products --------------------
 async function loadAdminProducts() {
   adminLoading.style.display = 'block';
   adminProductsList.innerHTML = '';
 
   if (isDemoMode) {
     adminLoading.style.display = 'none';
-    adminProductsList.innerHTML = `
-      <tr>
-        <td colspan="4" class="text-center text-muted">
-          En mode démo, la liste est vide. Vous pouvez tester l'ajout d'un produit ci-contre, il apparaîtra ici temporairement.
-        </td>
-      </tr>
-    `;
+    adminProductsList.innerHTML = `<tr><td colspan="4" class="text-center text-muted">En mode démo, la liste est vide. Vous pouvez tester l'ajout d'un produit ci‑contre, il apparaîtra ici temporairement.</td></tr>`;
     return;
   }
 
-  try {
-    const querySnapshot = await getDocs(collection(db, "products"));
-    adminLoading.style.display = 'none';
-    
-    if (querySnapshot.empty) {
-      adminProductsList.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Aucun produit dans la base de données.</td></tr>';
-      return;
-    }
-
-    querySnapshot.forEach((docSnap) => {
-      const product = docSnap.data();
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><img src="${product.image}" alt="${product.name}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;"></td>
-        <td class="fw-bold">${product.name}</td>
-        <td>${product.price}</td>
-        <td class="text-end">
-          <button class="btn btn-sm btn-danger delete-btn" data-id="${docSnap.id}">
-            <i class="bi bi-trash"></i>
-          </button>
-        </td>
-      `;
-      adminProductsList.appendChild(tr);
-    });
-
-    // Attacher les events de suppression
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        if(confirm("Voulez-vous vraiment supprimer ce produit ?")) {
-          const id = e.currentTarget.getAttribute('data-id');
-          await deleteDoc(doc(db, "products", id));
-          loadAdminProducts(); // Recharger
-        }
-      });
-    });
-
-  } catch (error) {
+  const { data: products, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+  adminLoading.style.display = 'none';
+  if (error) {
     console.error(error);
-    adminLoading.style.display = 'none';
-    adminProductsList.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Erreur de chargement. Vérifiez vos règles Firestore.</td></tr>';
+    adminProductsList.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Erreur de chargement. Vérifiez vos règles Supabase.</td></tr>`;
+    return;
   }
+  if (products.length === 0) {
+    adminProductsList.innerHTML = `<tr><td colspan="4" class="text-center text-muted">Aucun produit dans la base de données.</td></tr>`;
+    return;
+  }
+  products.forEach((product) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><img src="${product.image_url}" alt="${product.name}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;"/></td>
+      <td class="fw-bold">${product.name}</td>
+      <td>${product.price}</td>
+      <td class="text-end"><button class="btn btn-sm btn-danger delete-btn" data-id="${product.id}"><i class="bi bi-trash"></i></button></td>
+    `;
+    adminProductsList.appendChild(tr);
+  });
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      if (!confirm('Voulez‑vous vraiment supprimer ce produit ?')) return;
+      const id = e.currentTarget.getAttribute('data-id');
+      const { error } = await supabase.from('products').delete().eq('id', id);
+      if (error) console.error(error);
+      else loadAdminProducts();
+    });
+  });
 }
 
-// Ajouter un produit
 addProductForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  
   const name = document.getElementById('product-name').value;
   const price = document.getElementById('product-price').value;
-  const imageUrl = document.getElementById('product-image').value;
+  const imageFile = document.getElementById('product-image').files[0];
 
   if (isDemoMode) {
-    // Mode démo: on ajoute juste visuellement au tableau
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td><span class="badge bg-secondary">Image Simulée</span></td>
@@ -148,7 +121,7 @@ addProductForm.addEventListener('submit', async (e) => {
       <td>${price}</td>
       <td class="text-end"><button class="btn btn-sm btn-danger" onclick="this.closest('tr').remove()"><i class="bi bi-trash"></i></button></td>
     `;
-    if(adminProductsList.innerHTML.includes("En mode démo")) adminProductsList.innerHTML = '';
+    if (adminProductsList.innerHTML.includes('En mode démo')) adminProductsList.innerHTML = '';
     adminProductsList.prepend(tr);
     addProductForm.reset();
     return;
@@ -158,19 +131,22 @@ addProductForm.addEventListener('submit', async (e) => {
   submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enregistrement...';
 
   try {
-    // Save info directly to Firestore without uploading image to Storage
-    await addDoc(collection(db, "products"), {
-      name: name,
-      price: price,
-      image: imageUrl,
-      createdAt: new Date()
-    });
+    // 1️⃣ Upload image to Supabase Storage
+    const filePath = `${Date.now()}_${imageFile.name}`;
+    const { error: uploadErr } = await supabase.storage.from('product-images').upload(filePath, imageFile);
+    if (uploadErr) throw uploadErr;
+    const { data: publicUrlData } = supabase.storage.from('product-images').getPublicUrl(filePath);
+    const imageUrl = publicUrlData.publicUrl;
+
+    // 2️⃣ Insert product record
+    const { error: insertErr } = await supabase.from('products').insert({ name, price, image_url: imageUrl });
+    if (insertErr) throw insertErr;
 
     addProductForm.reset();
     loadAdminProducts();
-  } catch (error) {
-    console.error("Erreur d'ajout:", error);
-    alert("Une erreur est survenue lors de l'ajout.");
+  } catch (err) {
+    console.error(err);
+    alert('Une erreur est survenue lors de l\'ajout du produit.');
   } finally {
     submitBtn.disabled = false;
     submitBtn.innerHTML = 'Enregistrer';
